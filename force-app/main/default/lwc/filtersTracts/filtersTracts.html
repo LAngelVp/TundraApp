@@ -1,0 +1,79 @@
+<template>
+    <div class="slds-grid slds-p-around_x-small">
+        <div>
+            <lightning-button 
+                class="slds-m-right_x-small"
+                label="Filtros" 
+                icon-name="utility:filterList" 
+                onclick={openModal}>
+            </lightning-button>
+        </div>
+        <div>
+            <lightning-button 
+                label="Limpiar" 
+                icon-name="utility:refresh" 
+                onclick={handleReset}>
+            </lightning-button>
+        </div>
+    </div>
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Filtros de Búsqueda</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox name="marca" label="Marca" options={brandOptions} value={filtros.marca} onchange={handleFilterChange}></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox name="modelo" label="Modelo" options={modelOptions} value={filtros.modelo} onchange={handleFilterChange} disabled={isModelDisabled}></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input name="anio" type="number" label="Año" value={filtros.anio} onchange={handleFilterChange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox 
+                                name="estado" 
+                                label="Estado de la Unidad" 
+                                options={statusOptions} 
+                                value={filtros.estado} 
+                                onchange={handleFilterChange}
+                                placeholder="Todos los estados">
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input name="precioMin" type="number" label="Precio Mínimo" value={filtros.precioMin} onchange={handleFilterChange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input name="precioMax" type="number" label="Precio Máximo" value={filtros.precioMax} onchange={handleFilterChange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input name="marcaMotor" type="text" label="Marca de motor" value={filtros.marcaMotor} onchange={handleFilterChange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input name="modeloMotor" type="text" label="Modelo de motor" value={filtros.modeloMotor} onchange={handleFilterChange}></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox 
+                                name="transmision" 
+                                label="Transmisión" 
+                                options={transmissionOptions} 
+                                value={filtros.transmision} 
+                                onchange={handleFilterChange}>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal}>Cancelar</button>
+                    <button class="slds-button slds-button_brand" onclick={aplicarFiltros}>Aplicar Filtros</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

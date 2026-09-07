@@ -1,0 +1,94 @@
+<template>
+    <div class="chat-container">
+        <button
+            class="chat-button"
+            onclick={handleToggleChat}
+            title="Abrir chat">
+            <img src={AGENT_ICON_CHAT} alt="Chat" class="chat-icon" />
+        </button>
+
+        <div if:true={isOpen} class="chat-window">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <h3>Agent KREIBI</h3>
+                    <span class="status-indicator" title="Conectado"></span>
+                </div>
+                <button class="close-button" onclick={handleToggleChat} title="Cerrar chat">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="session-banner">
+                <span class="session-banner-text">Sesión activa • {sessionIdLabel}</span>
+            </div>
+
+            <div class="chat-messages" lwc:ref="messagesContainer">
+                <template if:true={messages.length}>
+                    <template for:each={messages} for:item="message">
+                        <div key={message.id}>
+                            
+                            <template lwc:if={message.isUser}>
+                                <div class="message-wrapper user">
+                                    <div class="message-bubble">
+                                        <lightning-formatted-rich-text class="message-richtext" value={message.html}></lightning-formatted-rich-text>
+                                        <span class="message-time">{message.timestamp}</span>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template lwc:else>
+                                <div class="message-wrapper agent">
+                                    <div class="message-bubble">
+                                        <template lwc:if={message.html}>
+                                            <lightning-formatted-rich-text class="message-richtext" value={message.html}></lightning-formatted-rich-text>
+                                        </template>
+                                        <template lwc:else>
+                                            <p class="message-text">{message.text}</p>
+                                        </template>
+                                        <span class="message-time">{message.timestamp}</span>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+                    </template>
+                </template>
+
+                <template lwc:if={messages.length}></template>
+                <template lwc:else>
+                    <div class="welcome-message">
+                        <p>¡Hola! Soy tu asistente virtual Kreibi. ¿En qué puedo ayudarte?</p>
+                    </div>
+                </template>
+            </div>
+
+            <div class="chat-input-container">
+                <input
+                    type="text"
+                    class="chat-input"
+                    placeholder="Escribe tu mensaje..."
+                    value={inputMessage}
+                    onchange={handleInputChange}
+                    onkeypress={handleKeyPress}
+                    disabled={isLoading}
+                />
+                <button
+                    class="send-button"
+                    onclick={handleSendMessage}
+                    disabled={isLoading}
+                    title="Enviar mensaje">
+                    <template if:false={isLoading}>
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,22.99 3.50612381,23.1 4.13399899,22.8429026 L21.714504,14.0454487 C22.6563168,13.5741566 23.1272231,12.6315722 22.9702544,11.6889879 L4.13399899,1.16390249 C3.34915502,0.9 2.40734225,1.00636533 1.77946707,1.4776575 C0.994623095,2.10604706 0.837654326,3.0486314 1.15159189,3.99721575 L3.03521743,10.4382088 C3.03521743,10.5953061 3.19218622,10.7524035 3.50612381,10.7524035 L16.6915026,11.5378905 C16.6915026,11.5378905 17.1624089,11.5378905 17.1624089,12.0091827 C17.1624089,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z"/>
+                        </svg>
+                    </template>
+                    <template if:true={isLoading}>
+                        <span class="loading-spinner"></span>
+                    </template>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>

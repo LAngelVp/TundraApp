@@ -1,0 +1,13 @@
+.scroll {
+    max-height: 100vh; 
+    height: 100%;
+    overflow-y: auto; 
+    overflow-x: hidden;
+    padding: 0.5rem;
+    scrollbar-width: thin; 
+    scrollbar-color: #0176d3 #f3f2f2; 
+    width: 100%;
+}
+/* .mi-icono-personalizado {
+    --slds-c-icon-color-foreground: #FF5733;
+} */

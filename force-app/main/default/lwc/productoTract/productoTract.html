@@ -1,0 +1,28 @@
+<template>
+    <section class="slds-grid slds-wrap slds-gutters_small slds-grid_align-center scroll">
+        <template for:each={allTractsChild} for:item="tracto">
+            <div key={tracto.Id} class="slds-col slds-grow-none slds-m-bottom_medium">
+                <lightning-card title={tracto.tracto.Name} 
+                                variant="Narrow" 
+                                icon-name='utility:transport_heavy_truck' alternative-text='transport_heavy_truck' size='large'
+                                class="truck-card">
+                    <div class="slds-p-horizontal_small" style="width:230px;">
+                        <p><strong>Modelo:</strong> {tracto.tracto.Modelo__c}</p>
+                        <p><strong>Precio:</strong> ${tracto.tracto.Precio_Venta__c}</p>
+                        <p><strong>Estado:</strong> {tracto.tracto.Estado_de_la_Unidad__c}</p>
+                        <p><strong>VIN:</strong> {tracto.tracto.NumeroVIN__c}</p>
+                        <p><strong>Año:</strong> {tracto.tracto.Year_Modelo__c}</p>
+                    </div>
+                    <div slot="footer">
+                        <lightning-button 
+                            label="Detalles" 
+                            variant="brand" 
+                            onclick={handleOpenDetails} 
+                            data-id={tracto.tracto.Id}>
+                        </lightning-button>
+                    </div>
+                </lightning-card>
+            </div>
+        </template>
+    </section>
+</template>
