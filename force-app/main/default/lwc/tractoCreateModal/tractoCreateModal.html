@@ -1,0 +1,102 @@
+<template>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container modal-container">
+
+            <!-- ENCABEZADO FIJO -->
+            <header class="modal-header">
+                <div class="brand-title">
+                    <div class="header-icon">
+                        <lightning-icon icon-name="utility:add" size="small" variant="inverse"></lightning-icon>
+                    </div>
+                    <div>
+                        <h2 class="unit-title">Registrar Nuevo Tractocamión (Apex)</h2>
+                        <p class="unit-subtitle">Complete la ficha de alta para sumar la unidad a la flota GPS</p>
+                    </div>
+                </div>
+                <button class="btn-close-header" onclick={closeModal} title="Cerrar ventana">
+                    <lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                </button>
+            </header>
+
+            <!-- CUERPO CON SCROLL E INPUTS DE FORMULARIO -->
+            <div class="modal-body custom-scrollbar">
+
+                <!-- SPINNER DE CARGA -->
+                <template if:true={isLoading}>
+                    <lightning-spinner alternative-text="Guardando registro..." size="medium" variant="brand"></lightning-spinner>
+                </template>
+
+                <!-- BLOQUE 1: IDENTIFICACIÓN COMERCIAL -->
+                <div class="form-section">
+                    <h3 class="section-title">1. Identificación Comercial y Estado</h3>
+                    <div class="form-grid">
+                        <lightning-input label="Nombre de la Unidad" value={tracto.Name} data-field="Name" onchange={handleInputChange} required></lightning-input>
+                        <lightning-input label="Modelo" value={tracto.Modelo__c} data-field="Modelo__c" onchange={handleInputChange} required></lightning-input>
+                        <lightning-input type="number" label="Año Modelo" value={tracto.Year_Modelo__c} data-field="Year_Modelo__c" onchange={handleInputChange} required></lightning-input>
+                        <lightning-input type="number" formatter="currency" label="Precio de Venta" value={tracto.Precio_Venta__c} data-field="Precio_Venta__c" onchange={handleInputChange} required></lightning-input>
+
+                        <lightning-combobox
+                            label="Estado de la Unidad"
+                            value={tracto.Estado_de_la_Unidad__c}
+                            options={estadoOptions}
+                            data-field="Estado_de_la_Unidad__c"
+                            onchange={handleInputChange}
+                            required>
+                        </lightning-combobox>
+
+                        <lightning-input label="Número VIN" value={tracto.NumeroVIN__c} data-field="NumeroVIN__c" onchange={handleInputChange} required></lightning-input>
+                        <lightning-input type="number" label="Kilometraje (km)" value={tracto.Kilometraje__c} data-field="Kilometraje__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 2: ESPECIFICACIONES DE TREN MOTRIZ Y EJES -->
+                <div class="form-section">
+                    <h3 class="section-title">2. Especificaciones de Tren Motriz y Ejes</h3>
+                    <div class="form-grid">
+                        <lightning-input label="Marca de Motor" value={tracto.Marca_de_Motor__c} data-field="Marca_de_Motor__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input label="Modelo del Motor" value={tracto.Modelo_del_Motor__c} data-field="Modelo_del_Motor__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input type="number" label="Potencia (HP)" value={tracto.Caballos_de_fuerza_HP__c} data-field="Caballos_de_fuerza_HP__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input label="Transmisión" value={tracto.Transmision__c} data-field="Transmision__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input label="Camarote" value={tracto.Camarote__c} data-field="Camarote__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input label="Capacidad Suspensión" value={tracto.Capacidad_de_Suspension__c} data-field="Capacidad_de_Suspension__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input label="Eje Delantero" value={tracto.Capacidad_Ejes_Delanteros__c} data-field="Capacidad_Ejes_Delanteros__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input label="Eje Trasero" value={tracto.Capacidad_Ejes_Traseros__c} data-field="Capacidad_Ejes_Traseros__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input label="Paso Diferenciales" value={tracto.Paso_de_Diferenciales__c} data-field="Paso_de_Diferenciales__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 3: TELEMETRÍA Y UBICACIÓN GPS -->
+                <div class="form-section">
+                    <h3 class="section-title">3. Ubicación GPS Inicial y Telemetría</h3>
+                    <div class="form-grid">
+                        <lightning-input type="number" step="0.000001" label="Latitud GPS" value={tracto.Ubicacion_GPS__Latitude__s} data-field="Ubicacion_GPS__Latitude__s" onchange={handleInputChange}></lightning-input>
+                        <lightning-input type="number" step="0.000001" label="Longitud GPS" value={tracto.Ubicacion_GPS__Longitude__s} data-field="Ubicacion_GPS__Longitude__s" onchange={handleInputChange}></lightning-input>
+                        <lightning-input type="number" label="Velocidad (km/h)" value={tracto.Velocidad_KmH__c} data-field="Velocidad_KmH__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+
+                <!-- BLOQUE 4: CONTACTO COMERCIAL Y MULTIMEDIA -->
+                <div class="form-section">
+                    <h3 class="section-title">4. Asignación Comercial y Notas</h3>
+                    <div class="form-grid">
+                        <lightning-input label="Nombre de Contacto" value={tracto.Nombre_Contacto__c} data-field="Nombre_Contacto__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input type="tel" label="Teléfono de Contacto" value={tracto.Numero_del_Contacto__c} data-field="Numero_del_Contacto__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-input type="email" label="Correo de Contacto" value={tracto.Correo_Contacto__c} data-field="Correo_Contacto__c" onchange={handleInputChange}></lightning-input>
+                        <lightning-textarea label="Observaciones Generales" value={tracto.Observaciones_Generales__c} data-field="Observaciones_Generales__c" onchange={handleInputChange} class="full-width-field"></lightning-textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER FIJO -->
+            <footer class="modal-footer">
+                <button type="button" class="btn-cancel" onclick={closeModal}>Cancelar</button>
+                <button type="button" class="btn-save" onclick={handleSave}>
+                    ⚡ Guardar Vía Apex
+                </button>
+            </footer>
+
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

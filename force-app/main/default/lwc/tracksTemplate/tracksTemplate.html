@@ -1,37 +1,68 @@
 <template>
     <div class="contenedor_global">
-        <div class="slds-text-heading_large slds-m-around_medium centrar slds-p-around_medium">
-            <h1 class="tituloPrincipal">TruckLocator 360</h1>
-        </div>
-        <div class="general-container">
-            <!-- CONTENEDOR DE LOS TRACTOS Y FILTROS -->
+        <!-- BANNER DE ENCABEZADO PRINCIPAL CON BOTÓN DE ALTA -->
+        <header class="header-banner">
+            <div class="banner-title-group">
+                <h1 class="tituloPrincipal">TruckLocator 360</h1>
+                <span class="subtitle">Gestión e Inteligencia de Flota en Tiempo Real</span>
+            </div>
+
+            <!-- BOTÓN ACCIÓN DE NUEVO REGISTRO -->
+            <button class="btn-create-tracto" onclick={handleOpenCreateModal}>
+                <lightning-icon icon-name="utility:add" size="x-small" variant="inverse" class="btn-icon-add"></lightning-icon>
+                Nuevo Tractocamión
+            </button>
+        </header>
+
+        <!-- CONTENEDOR PRINCIPAL PANTALLA COMPLETA -->
+        <main class="general-container">
+            <!-- COLUMNA 1: FILTROS + CATÁLOGO SCROLLABLE -->
             <div class="columna1">
                 <template if:true={renderizarHijos}>
-                    <section>
-                        <c-filters-tracts 
-                            tracks={allTracks} 
-                            onfilterapplied={handleFilteredData}
-                        ></c-filters-tracts>
+                    <section class="filtros-section">
+                        <c-filters-tracts
+                            tracks={allTracks}
+                            onfilterapplied={handleFilteredData}>
+                        </c-filters-tracts>
                     </section>
                     <section class="scroll-container">
-                        <c-producto-tract all-tracts-child={displayedTracks} onviewdetails={handleShowModal}></c-producto-tract>
+                        <c-producto-tract
+                            all-tracts-child={displayedTracks}
+                            onviewdetails={handleShowModal}>
+                        </c-producto-tract>
                     </section>
                 </template>
+
+                <!-- SPINNER DE CARGA -->
+                <template if:false={renderizarHijos}>
+                    <div class="loading-state">
+                        <lightning-spinner alternative-text="Cargando unidades..." size="medium" variant="brand"></lightning-spinner>
+                    </div>
+                </template>
             </div>
-            <!-- CONTENEDOR DEL MAPA -->
+
+            <!-- COLUMNA 2: MAPA INTERACTIVO LEAFLET -->
             <div class="columna2">
                 <template if:true={renderizarHijos}>
-                    <section>
-                        <c-mapa-leaflet tracks-for-map={displayedTracks}></c-mapa-leaflet>
-                    </section>
+                    <c-mapa-leaflet tracks-for-map={displayedTracks}></c-mapa-leaflet>
                 </template>
             </div>
-        </div>
+        </main>
     </div>
+
+    <!-- MODAL DE DETALLE DEL TRACTO -->
     <template if:true={isModalOpen}>
-        <c-tracto-detail-modal 
-            selected-tracto={tractoSeleccionado} 
+        <c-tracto-detail-modal
+            selected-tracto={tractoSeleccionado}
             onclose={handleCloseModal}>
         </c-tracto-detail-modal>
+    </template>
+
+    <!-- MODAL DE CREACIÓN DE NUEVO TRACTOCAMIÓN -->
+    <template if:true={isCreateModalOpen}>
+        <c-tracto-create-modal
+            onclose={handleCloseCreateModal}
+            oncreatedsuccess={handleTractoCreated}>
+        </c-tracto-create-modal>
     </template>
 </template>

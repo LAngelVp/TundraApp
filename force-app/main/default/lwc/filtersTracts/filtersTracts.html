@@ -1,77 +1,159 @@
 <template>
-    <div class="slds-grid slds-p-around_x-small">
-        <div>
-            <lightning-button 
-                class="slds-m-right_x-small"
-                label="Filtros" 
-                icon-name="utility:filterList" 
-                onclick={openModal}>
-            </lightning-button>
-        </div>
-        <div>
-            <lightning-button 
-                label="Limpiar" 
-                icon-name="utility:refresh" 
-                onclick={handleReset}>
-            </lightning-button>
+    <!-- BARRA SUPERIOR DE HERRAMIENTAS DE FILTRADO -->
+    <div class="filter-toolbar">
+        <div class="toolbar-left">
+            <button class="btn-filter" onclick={openModal}>
+                <lightning-icon icon-name="utility:filterList" size="x-small" class="btn-icon"></lightning-icon>
+                Filtros
+                <template if:true={activeFiltersCount}>
+                    <span class="filter-counter-badge">{activeFiltersCount}</span>
+                </template>
+            </button>
+
+            <button class="btn-reset" onclick={handleReset} title="Restablecer todos los filtros">
+                <lightning-icon icon-name="utility:refresh" size="x-small" class="btn-icon-reset"></lightning-icon>
+                Limpiar
+            </button>
         </div>
     </div>
+
+    <!-- MODAL DE FILTROS AVANZADOS -->
     <template if:true={isModalOpen}>
-        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <header class="slds-modal__header">
-                    <h2 class="slds-text-heading_medium">Filtros de Búsqueda</h2>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+            <div class="slds-modal__container modal-container">
+
+                <!-- ENCABEZADO FIJO DE FILTROS -->
+                <header class="modal-header">
+                    <div class="brand-title">
+                        <div class="header-icon">
+                            <lightning-icon icon-name="utility:filterList" size="small" variant="inverse"></lightning-icon>
+                        </div>
+                        <div>
+                            <h2 class="unit-title">Filtros de Búsqueda Avanzada</h2>
+                            <p class="unit-subtitle">Refine el inventario de la flota por modelo, especificaciones y precios</p>
+                        </div>
+                    </div>
+                    <button class="btn-close-header" onclick={closeModal} title="Cerrar ventana">
+                        <lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                    </button>
                 </header>
 
-                <div class="slds-modal__content slds-p-around_medium">
-                    <div class="slds-grid slds-wrap slds-gutters">
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-combobox name="marca" label="Marca" options={brandOptions} value={filtros.marca} onchange={handleFilterChange}></lightning-combobox>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-combobox name="modelo" label="Modelo" options={modelOptions} value={filtros.modelo} onchange={handleFilterChange} disabled={isModelDisabled}></lightning-combobox>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-input name="anio" type="number" label="Año" value={filtros.anio} onchange={handleFilterChange}></lightning-input>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-combobox 
-                                name="estado" 
-                                label="Estado de la Unidad" 
-                                options={statusOptions} 
-                                value={filtros.estado} 
+                <!-- CUERPO DE OPCIONES CON SCROLL -->
+                <div class="modal-body custom-scrollbar">
+
+                    <!-- BLOQUE 1: DATOS COMERCIALES -->
+                    <div class="filter-section">
+                        <h3 class="section-title">1. Clasificación Comercial y Estado</h3>
+                        <div class="filter-grid">
+                            <lightning-combobox
+                                name="marca"
+                                label="Nombre / Unidad"
+                                options={brandOptions}
+                                value={filtros.marca}
+                                onchange={handleFilterChange}
+                                placeholder="Todas las unidades">
+                            </lightning-combobox>
+
+                            <lightning-combobox
+                                name="modelo"
+                                label="Modelo"
+                                options={modelOptions}
+                                value={filtros.modelo}
+                                onchange={handleFilterChange}
+                                disabled={isModelDisabled}
+                                placeholder="Seleccionar modelo">
+                            </lightning-combobox>
+
+                            <lightning-input
+                                name="anio"
+                                type="number"
+                                label="Año Modelo"
+                                value={filtros.anio}
+                                onchange={handleFilterChange}
+                                placeholder="Ej. 2022">
+                            </lightning-input>
+
+                            <lightning-combobox
+                                name="estado"
+                                label="Estado de la Unidad"
+                                options={statusOptions}
+                                value={filtros.estado}
                                 onchange={handleFilterChange}
                                 placeholder="Todos los estados">
                             </lightning-combobox>
                         </div>
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-input name="precioMin" type="number" label="Precio Mínimo" value={filtros.precioMin} onchange={handleFilterChange}></lightning-input>
+                    </div>
+
+                    <!-- BLOQUE 2: RANGO DE PRECIOS -->
+                    <div class="filter-section">
+                        <h3 class="section-title">2. Rango de Precio ($ MXN)</h3>
+                        <div class="filter-grid">
+                            <lightning-input
+                                name="precioMin"
+                                type="number"
+                                formatter="currency"
+                                label="Precio Mínimo"
+                                value={filtros.precioMin}
+                                onchange={handleFilterChange}
+                                placeholder="$0">
+                            </lightning-input>
+
+                            <lightning-input
+                                name="precioMax"
+                                type="number"
+                                formatter="currency"
+                                label="Precio Máximo"
+                                value={filtros.precioMax}
+                                onchange={handleFilterChange}
+                                placeholder="$ No definido">
+                            </lightning-input>
                         </div>
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-input name="precioMax" type="number" label="Precio Máximo" value={filtros.precioMax} onchange={handleFilterChange}></lightning-input>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-input name="marcaMotor" type="text" label="Marca de motor" value={filtros.marcaMotor} onchange={handleFilterChange}></lightning-input>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-input name="modeloMotor" type="text" label="Modelo de motor" value={filtros.modeloMotor} onchange={handleFilterChange}></lightning-input>
-                        </div>
-                        <div class="slds-col slds-size_1-of-2">
-                            <lightning-combobox 
-                                name="transmision" 
-                                label="Transmisión" 
-                                options={transmissionOptions} 
-                                value={filtros.transmision} 
-                                onchange={handleFilterChange}>
+                    </div>
+
+                    <!-- BLOQUE 3: TREN MOTRIZ Y MOTOR -->
+                    <div class="filter-section">
+                        <h3 class="section-title">3. Especificaciones del Motor y Transmisión</h3>
+                        <div class="filter-grid">
+                            <lightning-input
+                                name="marcaMotor"
+                                type="text"
+                                label="Marca de Motor"
+                                value={filtros.marcaMotor}
+                                onchange={handleFilterChange}
+                                placeholder="Ej. PACCAR, Cummins">
+                            </lightning-input>
+
+                            <lightning-input
+                                name="modeloMotor"
+                                type="text"
+                                label="Modelo de Motor"
+                                value={filtros.modeloMotor}
+                                onchange={handleFilterChange}
+                                placeholder="Ej. MX-13, X15">
+                            </lightning-input>
+
+                            <lightning-combobox
+                                name="transmision"
+                                label="Transmisión"
+                                options={transmissionOptions}
+                                value={filtros.transmision}
+                                onchange={handleFilterChange}
+                                placeholder="Todas las transmisiones"
+                                class="full-width-field">
                             </lightning-combobox>
                         </div>
                     </div>
+
                 </div>
 
-                <footer class="slds-modal__footer">
-                    <button class="slds-button slds-button_neutral" onclick={closeModal}>Cancelar</button>
-                    <button class="slds-button slds-button_brand" onclick={aplicarFiltros}>Aplicar Filtros</button>
+                <!-- FOOTER FIJO ABAJO -->
+                <footer class="modal-footer">
+                    <button class="btn-cancel" onclick={closeModal}>Cancelar</button>
+                    <button class="btn-apply" onclick={aplicarFiltros}>
+                        ⚡ Aplicar Filtros
+                    </button>
                 </footer>
+
             </div>
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>

@@ -1,58 +1,199 @@
-.contenedor_global{
-    background: rgb(255, 255, 255);
-    border: 1px solid #aaaaaa;
-    border-radius: 0.5rem;
-}
-.tituloPrincipal{
-    font-weight: bold;
-    background-color: #90d1ff;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.centrar{
-    text-align: center;
-}
-.general-container {
-    display: flex;
-    width: 100%;
+:host {
+    /* Paleta Principal */
+    --color-brand-primary: #0B2545;
+    --color-brand-secondary: #D90429;
+    --color-accent-blue: #134074;
+
+    /* Neutros y Fondos */
+    --color-bg-main: #EEF4F8;
+    --color-bg-card: #FFFFFF;
+    --color-border: #D0DCE5;
+
+    /* Tipografía */
+    --color-text-main: #1D2A44;
+    --color-text-muted: #6B7A90;
+
+    /* Estados de la Flota */
+    --color-status-disponible: #10B981;
+    --color-status-mantenimiento: #F59E0B;
+    --color-status-vendido: #EF4444;
+
+    display: block;
     height: 100vh;
-    min-height: 100%;
-    max-height: 100vh;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    background: rgb(255, 255, 255);
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.general-container div {
+/* Reset Global de Box Sizing */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Contenedor Global que Ocupa la Pantalla Completa */
+.contenedor_global {
+    background: var(--color-bg-main);
+    border: 1px solid var(--color-border);
     border-radius: 0.5rem;
-    background: rgb(255, 255, 255);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    gap: 0.75rem;
     overflow: hidden;
 }
 
-/* Asegurar que el mapa ocupe todo el espacio */
-.general-container div:last-child {
+/* Banner de Encabezado Principal Flex Layout */
+.header-banner {
+    background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-accent-blue) 100%);
+    color: var(--color-bg-card);
+    padding: 0.85rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(11, 37, 69, 0.15);
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.banner-title-group {
     display: flex;
     flex-direction: column;
 }
+
+.tituloPrincipal {
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: #FFFFFF;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.subtitle {
+    font-size: 0.75rem;
+    color: #94A3B8;
+}
+
+/* Botón Nuevo Tracto */
+.btn-create-tracto {
+    background-color: var(--color-brand-secondary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.825rem;
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(217, 4, 41, 0.3);
+}
+
+.btn-create-tracto:hover {
+    background-color: #B80320;
+    transform: translateY(-1px);
+}
+
+.btn-icon-add {
+    --slds-c-icon-color-foreground: #FFFFFF;
+}
+
+/* Contenedor Principal en Flex Layout */
+.general-container {
+    display: flex;
+    width: 100%;
+    flex: 1;
+    gap: 0.75rem;
+    background: transparent;
+    overflow: hidden;
+}
+
+.general-container > div {
+    border-radius: 0.5rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 2px 8px rgba(11, 37, 69, 0.06);
+    overflow: hidden;
+}
+
+/* Columna 1: Filtros y Lista de Productos */
 .columna1 {
-    flex: 0 0 350px; /* Ancho fijo para la lista, ajusta a tu gusto */
-    margin: 0;
-    padding: 0.5rem;
+    flex: 0 0 380px;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    padding: 0.5rem;
 }
+
+/* Columna 2: Mapa Leaflet */
 .columna2 {
-    flex: 1; /* El mapa toma todo el espacio restante */
-    margin: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     padding: 0;
 }
+
+.columna2 > template,
+.columna2 section,
+c-mapa-leaflet {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
 section {
     margin: 0;
     padding: 0;
 }
+
+/* Área de Scroll Interna para la Lista de Tractos */
 .scroll-container {
     overflow-y: auto;
-    flex-grow: 1;
+    flex: 1;
+    padding-right: 0.25rem;
+}
+
+/* Scrollbar Personalizada Suave */
+.scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: #F1F5F9;
+    border-radius: 3px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: #CBD5E0;
+    border-radius: 3px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+/* Tarjetas de Tractocamiones */
+.tracto-card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.tracto-card:hover {
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 6px 16px rgba(19, 64, 116, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Estado de Carga */
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }

@@ -1,22 +1,38 @@
 import { LightningElement, api, track } from 'lwc';
 
 export default class FiltersTracts extends LightningElement {
-    @api tracks = []; // Datos originales
+    @api tracks = [];
     @track isModalOpen = false;
 
-    // Inicializamos todos los campos del filtro
     @track filtros = {
         marca: '',
         modelo: '',
         anio: '',
         estado: '',
-        precioMin: 0,
-        precioMax: 0,
+        precioMin: '',
+        precioMax: '',
         marcaMotor: '',
         modeloMotor: '',
         transmision: '',
         ejes: 0
     };
+
+    /**
+     * Calcula dinámicamente cuántos filtros están activos para mostrar el badge
+     */
+    get activeFiltersCount() {
+        let count = 0;
+        if (this.filtros.marca) count++;
+        if (this.filtros.modelo) count++;
+        if (this.filtros.anio) count++;
+        if (this.filtros.estado) count++;
+        if (this.filtros.precioMin && Number(this.filtros.precioMin) > 0) count++;
+        if (this.filtros.precioMax && Number(this.filtros.precioMax) > 0) count++;
+        if (this.filtros.marcaMotor) count++;
+        if (this.filtros.modeloMotor) count++;
+        if (this.filtros.transmision) count++;
+        return count;
+    }
 
     handleFilterChange(event) {
         const field = event.target.name;
@@ -26,15 +42,15 @@ export default class FiltersTracts extends LightningElement {
 
     handleReset() {
         this.filtros = {
-            marca: '', 
-            modelo: '', 
-            anio: '', 
-            estado: '', 
-            precioMin: 0, 
-            precioMax: 0, 
-            marcaMotor: '', 
-            modeloMotor: '', 
-            transmision: '', 
+            marca: '',
+            modelo: '',
+            anio: '',
+            estado: '',
+            precioMin: '',
+            precioMax: '',
+            marcaMotor: '',
+            modeloMotor: '',
+            transmision: '',
             ejes: 0
         };
         this.dispatchEvent(new CustomEvent('filterapplied', {
@@ -46,46 +62,36 @@ export default class FiltersTracts extends LightningElement {
         const resultados = this.tracks.filter(item => {
             const t = item.tracto || item;
 
-            // 1. Lógica de Marca, Modelo, Año y Estado
-            const matchMarca = !this.filtros.marca || t.Name === this.filtros.marca;
-            const matchModelo = !this.filtros.modelo || t.Modelo__c === this.filtros.modelo;
-            const matchAnio = !this.filtros.anio || t.Year_Modelo__c == this.filtros.anio;
-            const matchEstado = !this.filtros.estado || t.Estado_de_la_Unidad__c === this.filtros.estado;
-            const matchTransmision = !this.filtros.transmision || t.Transmision__c === this.filtros.transmision;
+            // 1. Marca, Modelo, Año, Estado y Transmisión
+            const matchMarca = !this.filtros.marca || (t.Name === this.filtros.marca);
+            const matchModelo = !this.filtros.modelo || (t.Modelo__c === this.filtros.modelo);
+            const matchAnio = !this.filtros.anio || (t.Year_Modelo__c == this.filtros.anio);
+            const matchEstado = !this.filtros.estado || (t.Estado_de_la_Unidad__c === this.filtros.estado);
+            const matchTransmision = !this.filtros.transmision || (t.Transmision__c === this.filtros.transmision);
 
-            // 2. Lógica de Motor (Búsqueda por texto)
-            const matchMotorM = !this.filtros.marcaMotor || 
+            // 2. Búsqueda por Texto en Motor
+            const matchMotorM = !this.filtros.marcaMotor ||
                 (t.Marca_de_Motor__c && t.Marca_de_Motor__c.toLowerCase().includes(this.filtros.marcaMotor.toLowerCase()));
-            
-            const matchMotorMod = !this.filtros.modeloMotor || 
+
+            const matchMotorMod = !this.filtros.modeloMotor ||
                 (t.Modelo_del_Motor__c && t.Modelo_del_Motor__c.toLowerCase().includes(this.filtros.modeloMotor.toLowerCase()));
 
-            // 3. Lógica Numérica (Precios y Ejes)
-            // Convertimos a Number para asegurar una comparación correcta
+            // 3. Rango de Precios
             const precioVenta = parseFloat(t.Precio_Venta__c) || 0;
             const matchPrecioMin = !this.filtros.precioMin || precioVenta >= parseFloat(this.filtros.precioMin);
             const matchPrecioMax = !this.filtros.precioMax || precioVenta <= parseFloat(this.filtros.precioMax);
-            
-            // Suma de ejes (Delanteros + Traseros)
-            const totalEjes = (parseInt(t.Capacidad_Ejes_Delanteros__c) || 0) + (parseInt(t.Capacidad_Ejes_Traseros__c) || 0);
-            const matchEjes = !this.filtros.ejes || totalEjes >= parseInt(this.filtros.ejes);
 
-            // Retornamos true solo si cumple TODAS las condiciones
-            return matchMarca && 
-                matchModelo && 
-                matchAnio && 
-                matchEstado && 
-                matchTransmision &&
-                matchMotorM && 
-                matchMotorMod && 
-                matchPrecioMin && 
-                matchPrecioMax && 
-                matchEjes;
+            return matchMarca &&
+                   matchModelo &&
+                   matchAnio &&
+                   matchEstado &&
+                   matchTransmision &&
+                   matchMotorM &&
+                   matchMotorMod &&
+                   matchPrecioMin &&
+                   matchPrecioMax;
         });
 
-        console.log('Filtros aplicados, resultados encontrados:', resultados.length);
-
-        // Enviar los datos filtrados al componente padre
         this.dispatchEvent(new CustomEvent('filterapplied', {
             detail: { data: resultados }
         }));
@@ -93,44 +99,34 @@ export default class FiltersTracts extends LightningElement {
         this.closeModal();
     }
 
-    // Getters para opciones dinámicas
-    get isModelDisabled() { return !this.filtros.marca; }
+    get isModelDisabled() {
+        return !this.filtros.marca;
+    }
 
     get brandOptions() {
-        const marcas = [...new Set(this.tracks.map(item => item.tracto?.Name || item.Name))];
-        return marcas.map(m => ({ label: m, value: m }));
+        if (!this.tracks) return [];
+        const marcas = [...new Set(this.tracks.map(item => (item.tracto?.Name || item.Name)))];
+        return marcas.filter(m => m).map(m => ({ label: m, value: m }));
     }
 
     get modelOptions() {
-        if (!this.filtros.marca) return [];
+        if (!this.filtros.marca || !this.tracks) return [];
         const modelos = this.tracks
             .filter(item => (item.tracto?.Name || item.Name) === this.filtros.marca)
-            .map(item => item.tracto?.Modelo__c || item.Modelo__c);
-        return [...new Set(modelos)].map(m => ({ label: m, value: m }));
+            .map(item => (item.tracto?.Modelo__c || item.Modelo__c));
+        return [...new Set(modelos)].filter(m => m).map(m => ({ label: m, value: m }));
     }
 
     get transmissionOptions() {
-    // Usamos Transmision__c que es el API Name que viene de tu consulta SOQL
+        if (!this.tracks) return [];
         const transmisiones = [...new Set(this.tracks.map(item => item.tracto?.Transmision__c || item.Transmision__c))];
-        
-        // Filtramos valores nulos o vacíos para que no aparezcan en el combo
-        return transmisiones
-            .filter(t => t) 
-            .map(t => ({ label: t, value: t }));
+        return transmisiones.filter(t => t).map(t => ({ label: t, value: t }));
     }
 
     get statusOptions() {
         if (!this.tracks) return [];
-        
-        // Extraemos todos los estados únicos del campo Estado_de_la_Unidad__c
-        const estados = [...new Set(this.tracks.map(item => 
-            item.tracto?.Estado_de_la_Unidad__c || item.Estado_de_la_Unidad__c
-        ))];
-        
-        // Formateamos para el combobox, eliminando valores nulos
-        return estados
-            .filter(est => est) 
-            .map(est => ({ label: est, value: est }));
+        const estados = [...new Set(this.tracks.map(item => item.tracto?.Estado_de_la_Unidad__c || item.Estado_de_la_Unidad__c))];
+        return estados.filter(est => est).map(est => ({ label: est, value: est }));
     }
 
     openModal() { this.isModalOpen = true; }

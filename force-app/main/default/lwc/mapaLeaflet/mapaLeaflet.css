@@ -1,3 +1,66 @@
+:host {
+    /* Paleta Principal */
+    --color-brand-primary: #0B2545;
+    --color-brand-secondary: #D90429;
+    --color-accent-blue: #134074;
+
+    /* Neutros y Fondos */
+    --color-bg-main: #EEF4F8;
+    --color-bg-card: #FFFFFF;
+    --color-border: #D0DCE5;
+
+    /* Tipografía */
+    --color-text-main: #1D2A44;
+    --color-text-muted: #6B7A90;
+
+    /* Estados de la Flota */
+    --color-status-disponible: #10B981;
+    --color-status-mantenimiento: #F59E0B;
+    --color-status-vendido: #EF4444;
+}
+
+/* Banner de Encabezado Principal */
+.header-banner {
+    background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-accent-blue) 100%);
+    color: var(--color-bg-card);
+    padding: 18px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(11, 37, 69, 0.15);
+}
+
+/* Tarjetas de Tractocamiones (Lista de la izquierda) */
+.tracto-card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s ease-in-out;
+}
+
+.tracto-card:hover {
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 6px 16px rgba(19, 64, 116, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Botón de Acción Principal */
+.btn-primary {
+    background-color: var(--color-brand-secondary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    padding: 8px 16px;
+}
+
+.btn-primary:hover {
+    background-color: #B80320;
+}
+
+
+/* ------------------------------------------------- */
+
+
 .map-container {
     display: flex;
     width: 100%;

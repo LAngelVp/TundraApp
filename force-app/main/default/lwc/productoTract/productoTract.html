@@ -1,28 +1,78 @@
 <template>
-    <section class="slds-grid slds-wrap slds-gutters_small slds-grid_align-center scroll">
-        <template for:each={allTractsChild} for:item="tracto">
-            <div key={tracto.Id} class="slds-col slds-grow-none slds-m-bottom_medium">
-                <lightning-card title={tracto.tracto.Name} 
-                                variant="Narrow" 
-                                icon-name='utility:transport_heavy_truck' alternative-text='transport_heavy_truck' size='large'
-                                class="truck-card">
-                    <div class="slds-p-horizontal_small" style="width:230px;">
-                        <p><strong>Modelo:</strong> {tracto.tracto.Modelo__c}</p>
-                        <p><strong>Precio:</strong> ${tracto.tracto.Precio_Venta__c}</p>
-                        <p><strong>Estado:</strong> {tracto.tracto.Estado_de_la_Unidad__c}</p>
-                        <p><strong>VIN:</strong> {tracto.tracto.NumeroVIN__c}</p>
-                        <p><strong>Año:</strong> {tracto.tracto.Year_Modelo__c}</p>
-                    </div>
-                    <div slot="footer">
-                        <lightning-button 
-                            label="Detalles" 
-                            variant="brand" 
-                            onclick={handleOpenDetails} 
-                            data-id={tracto.tracto.Id}>
-                        </lightning-button>
-                    </div>
-                </lightning-card>
+    <div class="catalog-container">
+        <!-- CABECERA DEL CATÁLOGO CON CONTADOR DE UNIDADES -->
+        <div class="catalog-header">
+            <span class="catalog-title">Resultados de Flota</span>
+            <span class="catalog-badge">{totalUnits} {unitsLabel}</span>
+        </div>
+
+        <!-- LISTA DE TARJETAS DE TRACTOCAMIONES -->
+        <template if:true={hasTracts}>
+            <div class="tracts-grid custom-scrollbar">
+                <template for:each={formattedTracts} for:item="item">
+                    <article key={item.id} class="tract-card">
+                        <!-- ENCABEZADO DE LA TARJETA -->
+                        <div class="card-header">
+                            <div class="header-left">
+                                <div class="truck-icon-wrapper">
+                                    <lightning-icon
+                                        icon-name="utility:transport_heavy_truck"
+                                        size="small">
+                                    </lightning-icon>
+                                </div>
+                                <div class="title-group">
+                                    <h2 class="unit-name" title={item.name}>{item.name}</h2>
+                                    <span class="unit-vin">VIN: {item.vin}</span>
+                                </div>
+                            </div>
+                            <!-- BADGE DINÁMICO DE ESTADO -->
+                            <span class={item.statusClass}>{item.estado}</span>
+                        </div>
+
+                        <!-- CUERPO DE ESPECIFICACIONES CLAVE -->
+                        <div class="card-body">
+                            <div class="spec-grid">
+                                <div class="spec-item">
+                                    <span class="spec-label">Modelo</span>
+                                    <span class="spec-value">{item.modelo}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-label">Año</span>
+                                    <span class="spec-value">{item.year}</span>
+                                </div>
+                                <div class="spec-item full-width">
+                                    <span class="spec-label">Precio de Lista</span>
+                                    <span class="spec-price">{item.formattedPrice}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PIE DE TARJETA CON BOTÓN DE ACCIÓN -->
+                        <div class="card-footer">
+                            <button
+                                class="btn-details"
+                                onclick={handleOpenDetails}
+                                data-id={item.id}>
+                                Ver Detalles Completos
+                                <lightning-icon
+                                    icon-name="utility:chevronright"
+                                    size="x-small"
+                                    class="btn-icon">
+                                </lightning-icon>
+                            </button>
+                        </div>
+                    </article>
+                </template>
             </div>
         </template>
-    </section>
+
+        <!-- ESTADO VACÍO CUANDO NO HAY RESULTADOS (MARKETING & UX) -->
+        <template if:false={hasTracts}>
+            <div class="empty-state">
+                <lightning-icon icon-name="utility:search" size="large" class="empty-icon"></lightning-icon>
+                <h3 class="empty-title">Sin unidades disponibles</h3>
+                <p class="empty-desc">No se encontraron tractocamiones que coincidan con los filtros aplicados.</p>
+            </div>
+        </template>
+    </div>
 </template>

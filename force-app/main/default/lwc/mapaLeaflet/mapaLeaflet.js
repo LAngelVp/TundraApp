@@ -5,15 +5,15 @@ import LEAFLET_RESOURCE from '@salesforce/resourceUrl/leaflet';
 export default class MapaLeaflet extends LightningElement {
     _tracksForMap = [];
     map;
-    markerLayer; 
+    markerLayer;
     isMapInitialized = false;
-    marcaColorMap = new Map();
-    @api 
+
+    @api
     get tracksForMap() {
         return this._tracksForMap;
     }
     set tracksForMap(value) {
-        this._tracksForMap = value;
+        this._tracksForMap = value || [];
         if (this.isMapInitialized) {
             this.refreshMarkers();
         }
@@ -27,8 +27,8 @@ export default class MapaLeaflet extends LightningElement {
     async initMap() {
         try {
             await Promise.all([
-                loadStyle(this, LEAFLET_RESOURCE + '/leaflet/leaflet.css'),
-                loadScript(this, LEAFLET_RESOURCE + '/leaflet/leaflet.js')
+                loadStyle(this, LEAFLET_RESOURCE + '/dist/leaflet.css'),
+                loadScript(this, LEAFLET_RESOURCE + '/dist/leaflet.js')
             ]);
             this.createMap();
         } catch (error) {
@@ -44,7 +44,7 @@ export default class MapaLeaflet extends LightningElement {
                     [10.397963, -125.154309],
                     [40.046243, -83.929856]
                 ],
-                maxBoundsViscosity: 1.0 
+                maxBoundsViscosity: 1.0
             }).setView([23.6345, -102.5528], 5);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -53,66 +53,95 @@ export default class MapaLeaflet extends LightningElement {
                 attribution: '© OpenStreetMap'
             }).addTo(this.map);
 
-            this.map.attributionControl.setPrefix('Kenworth DAF del Este');
+            if (this.map.attributionControl) {
+                this.map.attributionControl.setPrefix('TruckLocator 360 | Kenworth DAF');
+            }
 
             this.markerLayer = L.layerGroup().addTo(this.map);
-            
             this.isMapInitialized = true;
             this.refreshMarkers();
 
             setTimeout(() => {
-                this.map.invalidateSize();
-            }, 200);
+                if (this.map) {
+                    this.map.invalidateSize();
+                }
+            }, 300);
         }
     }
 
     refreshMarkers() {
         if (!this.map || !this.markerLayer) return;
         this.markerLayer.clearLayers();
-        const palette = ['#0176d3', '#2e844a', '#ba0517', '#f88962', '#906068', '#54698d', '#706e6b'];
-        let colorIndex = 0;
+
         this._tracksForMap.forEach((punto) => {
-            const lat = parseFloat(punto.tracto?.Coordenada_Latitud__c);
-            const lng = parseFloat(punto.tracto?.Coordenada_Longitud__c);
+            const tracto = punto.tracto || punto;
+
+            // Soporte dinámico para las API names de Geolocalización (Ubicacion_GPS__Latitude__s) o legacy (Coordenada_Latitud__c)
+            const lat = parseFloat(tracto.Ubicacion_GPS__Latitude__s ?? tracto.Coordenada_Latitud__c);
+            const lng = parseFloat(tracto.Ubicacion_GPS__Longitude__s ?? tracto.Coordenada_Longitud__c);
+
             if (!isNaN(lat) && !isNaN(lng)) {
-                const marca = punto.tracto.Name || 'Desconocida';
-                if (!this.marcaColorMap.has(marca)) {
-                    this.marcaColorMap.set(marca, palette[colorIndex % palette.length]);
-                    colorIndex++;
-                }
-                const markerColor = this.marcaColorMap.get(marca);
+                const estado = tracto.Estado_de_la_Unidad__c || 'Disponible';
+                const markerColor = this.getMarkerColor(estado);
+
+                // Marcadores dinámicos tipo CircleMarker con resplandor
                 const marker = L.circleMarker([lat, lng], {
-                    color: markerColor,
+                    color: '#FFFFFF',
                     fillColor: markerColor,
-                    fillOpacity: 0.8,
-                    radius: 8,
+                    fillOpacity: 0.9,
+                    radius: 9,
                     weight: 2
-                }).bindPopup(this.getPopupContent(punto, lat, lng));
+                }).bindPopup(this.getPopupContent(tracto, lat, lng));
+
                 this.markerLayer.addLayer(marker);
             }
         });
+
         this.ajustarVistaMapa();
     }
-    getPopupContent(punto, lat, lng) {
+
+    /**
+     * Define el color del punto según el estado de la unidad (Paleta Industrial)
+     */
+    getMarkerColor(estado) {
+        const e = (estado || '').toLowerCase();
+        if (e.includes('disponible')) return '#10B981'; // Emerald Green
+        if (e.includes('mantenimiento')) return '#F59E0B'; // Amber
+        if (e.includes('vendido')) return '#EF4444'; // Red
+        return '#134074'; // Navy Blue por defecto
+    }
+
+    /**
+     * Genera el Popup estilizado con la paleta de colores corporativa
+     */
+    getPopupContent(tracto, lat, lng) {
+        const precio = tracto.Precio_Venta__c
+            ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(tracto.Precio_Venta__c)
+            : 'N/A';
+
         return `
-            <div class="salesforce-popup">
-                <div class="popup-header" style="background: #0176d3; color: white; padding: 8px; border-radius: 4px 4px 0 0;">
-                    <h3 style="margin: 0; font-size: 14px;">📍 ${punto.tracto.Name}</h3>
+            <div style="font-family: -apple-system, sans-serif; min-width: 180px;">
+                <div style="background: #0B2545; color: white; padding: 8px 12px; border-radius: 6px 6px 0 0; margin: -14px -20px 10px -20px;">
+                    <strong style="font-size: 13px; display: block;">📍 ${tracto.Name}</strong>
+                    <span style="font-size: 10px; color: #94A3B8;">VIN: ${tracto.NumeroVIN__c || 'N/A'}</span>
                 </div>
-                <div class="popup-content" style="padding: 10px; border: 1px solid #ccc; border-top: none;">
-                    <strong>Modelo:</strong> ${punto.tracto.Modelo__c || 'N/A'}<br>
-                    <strong>Estado:</strong> ${punto.tracto.Estado_de_la_Unidad__c || 'N/A'}<br>
-                    <strong>Precio:</strong> ${punto.tracto.Precio_Venta__c ? '$' + punto.tracto.Precio_Venta__c : 'N/A'}<br>
-                    <div style="font-size: 10px; color: #777; margin-top: 5px;">Coord: ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+                <div style="font-size: 12px; color: #1E293B; line-height: 1.5;">
+                    <div><strong>Modelo:</strong> ${tracto.Modelo__c || 'N/A'} (${tracto.Year_Modelo__c || 'N/A'})</div>
+                    <div><strong>Estado:</strong> <span style="font-weight: bold; color: ${this.getMarkerColor(tracto.Estado_de_la_Unidad__c)};">${tracto.Estado_de_la_Unidad__c || 'Disponible'}</span></div>
+                    <div><strong>Precio:</strong> <span style="color: #0B2545; font-weight: bold;">${precio}</span></div>
+                    <div style="font-size: 10px; color: #64748B; margin-top: 6px; padding-top: 4px; border-top: 1px dashed #E2E8F0;">
+                        Coord: ${lat.toFixed(4)}, ${lng.toFixed(4)}
+                    </div>
                 </div>
             </div>
         `;
     }
+
     ajustarVistaMapa() {
         const markers = this.markerLayer.getLayers();
         if (markers.length > 0) {
             const group = new L.featureGroup(markers);
-            this.map.fitBounds(group.getBounds(), { padding: [50, 50] });
+            this.map.fitBounds(group.getBounds(), { padding: [40, 40] });
         }
     }
 }

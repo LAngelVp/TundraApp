@@ -1,88 +1,200 @@
 <template>
-    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium">
-        <div class="slds-modal__container">
-            <header class="slds-modal__header">
-                <h2 class="slds-text-heading_medium">Detalles del Tracto: {selectedTracto.tracto.Name}</h2>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container modal-container">
+
+            <!-- ENCABEZADO FIJO -->
+            <header class="modal-header">
+                <div class="header-content">
+                    <div class="brand-title">
+                        <div class="header-icon">
+                            <lightning-icon icon-name="utility:transport_heavy_truck" size="small" variant="inverse"></lightning-icon>
+                        </div>
+                        <div>
+                            <h2 class="unit-title">{unitName}</h2>
+                            <p class="unit-subtitle">VIN: {unitVin} | Año: {unitYear} | {companyName}</p>
+                        </div>
+                    </div>
+                    <span class={statusClass}>{unitStatus}</span>
+                </div>
+                <button class="btn-close-header" onclick={closeModal} title="Cerrar ventana">
+                    <lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                </button>
             </header>
 
-            <div class="slds-modal__content slds-p-around_medium">
-                <div class="slds-grid slds-wrap slds-gutters">
-                    
-                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_medium slds-align_absolute-center">
-                        <div class="rich-text-container">
-                            <template if:true={firstImage}>
-                                <lightning-formatted-rich-text value={firstImage}>
-                                </lightning-formatted-rich-text>
-                            </template>
-                            <template if:false={firstImage}>
-                                <span>Sin imagen disponible</span>
-                            </template>
-                        </div>
-                    </div>
+            <!-- CUERPO CON SCROLL INDEPENDIENTE -->
+            <div class="modal-body custom-scrollbar">
 
-                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-                        <h3 class="slds-section-title_divider">Información General</h3>
-                        <div class="slds-grid slds-wrap slds-p-top_small">
-                            <div class="slds-col slds-size_1-of-2"><strong>Modelo:</strong> {selectedTracto.tracto.Modelo__c}</div>
-                            <div class="slds-col slds-size_1-of-2"><strong>Año:</strong> {selectedTracto.tracto.Year_Modelo__c}</div>
-                            <div class="slds-col slds-size_1-of-2"><strong>Precio:</strong> ${selectedTracto.tracto.Precio_Venta__c}</div>
-                            <div class="slds-col slds-size_1-of-2"><strong>Estado:</strong> {selectedTracto.tracto.Estado_de_la_Unidad__c}</div>
-                            <div class="slds-col slds-size_1-of-1"><strong>VIN:</strong> {selectedTracto.tracto.NumeroVIN__c}</div>
-                        </div>
-                    </div>
+                <!-- RESUMEN PRINCIPAL + TELEMETRÍA EN VIVO -->
+                <div class="top-overview-grid">
 
-                    <div class="slds-col slds-size_1-of-1 slds-m-top_medium">
-                        <h3 class="slds-section-title_divider">Especificaciones Técnicas</h3>
-                        <div class="slds-grid slds-wrap slds-p-around_small">
-                            <div class="slds-col slds-size_1-of-3"><strong>Motor:</strong> {selectedTracto.tracto.Marca_de_Motor__c} ({selectedTracto.tracto.Modelo_del_Motor__c})</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Potencia (HP):</strong> {selectedTracto.tracto.Caballos_de_fuerza_HP__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Kilometraje:</strong> {selectedTracto.tracto.Kilometraje__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Transmisión:</strong> {selectedTracto.tracto.Transmision__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Camarote:</strong> {selectedTracto.tracto.Camarote__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Suspensión:</strong> {selectedTracto.tracto.Capacidad_de_Suspension__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Eje Delantero:</strong> {selectedTracto.tracto.Capacidad_Ejes_Delanteros__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Eje Trasero:</strong> {selectedTracto.tracto.Capacidad_Ejes_Traseros__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Paso Diferencial:</strong> {selectedTracto.tracto.Paso_de_Diferenciales__c}</div>
-                        </div>
-                    </div>
-
-                    <div class="slds-col slds-size_1-of-1 slds-m-top_medium">
-                        <h3 class="slds-section-title_divider">Observaciones Generales</h3>
-                        <div class="slds-p-around_small">
-                            <p>{selectedTracto.tracto.Observaciones_Generales__c}</p>
-                        </div>
-                    </div>
-
-                    <div class="slds-col slds-size_1-of-1 slds-m-top_medium">
-                        <h3 class="slds-section-title_divider">Contacto y Ubicación</h3>
-                        <div class="slds-grid slds-wrap slds-p-around_small">
-                            <div class="slds-col slds-size_1-of-3"><strong>Contacto:</strong> {selectedTracto.tracto.Nombre_Contacto__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Teléfono:</strong> {selectedTracto.tracto.Numero_del_Contacto__c}</div>
-                            <div class="slds-col slds-size_1-of-3"><strong>Email:</strong> {selectedTracto.tracto.Correo_Contacto__c}</div>
-                            <div class="slds-col slds-size_1-of-1 slds-m-top_x-small">
-                                <strong>Coordenadas:</strong> Lat {selectedTracto.tracto.Coordenada_Latitud__c} , Lon {selectedTracto.tracto.Coordenada_Longitud__c}
+                    <!-- FOTO PRINCIPAL -->
+                    <div class="main-image-card">
+                        <template if:true={firstImage}>
+                            <div class="rich-image-wrapper">
+                                <lightning-formatted-rich-text value={firstImage}></lightning-formatted-rich-text>
                             </div>
-                        </div>
+                        </template>
+                        <template if:false={firstImage}>
+                            <div class="no-image-placeholder">
+                                <lightning-icon icon-name="utility:photo" size="large" class="placeholder-icon"></lightning-icon>
+                                <span>Sin fotografía disponible</span>
+                            </div>
+                        </template>
                     </div>
 
-                    <template if:true={hasRemainingImages}>
-                        <div class="slds-col slds-size_1-of-1 slds-m-top_medium">
-                            <h3 class="slds-section-title_divider">Más Imágenes Complementarias</h3>
-                            <div class="slds-grid slds-wrap slds-p-around_small">
-                                <template for:each={remainingImages} for:item="imgHtml">
-                                        <div key={imgHtml} class="slds-col slds-size_1-of-4 slds-p-around_x-small">
-                                            <lightning-formatted-rich-text value={imgHtml}>
-                                            </lightning-formatted-rich-text>
-                                        </div>
-                                    </template>
+                    <!-- BANNER FINANCIERO Y TELEMETRÍA -->
+                    <div class="executive-summary">
+                        <div class="price-banner">
+                            <div class="price-main">
+                                <span class="price-label">Precio de Venta Sugerido</span>
+                                <span class="price-value">{formattedPrice}</span>
+                            </div>
+                            <template if:true={estimatedMonthlyLease}>
+                                <div class="lease-badge">
+                                    <span>Est. Arrendamiento: <strong>{estimatedMonthlyLease}/mes</strong></span>
                                 </div>
+                            </template>
+                        </div>
+
+                        <!-- KPIs RÁPIDOS -->
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <span class="kpi-label">Modelo</span>
+                                <span class="kpi-value">{unitModel}</span>
                             </div>
-                    </template>
+                            <div class="kpi-card">
+                                <span class="kpi-label">Kilometraje</span>
+                                <span class="kpi-value">{unitKilometers}</span>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-label">Motor</span>
+                                <span class="kpi-value">{unitEngineBrand}</span>
+                            </div>
+                            <div class="kpi-card">
+                                <span class="kpi-label">Potencia</span>
+                                <span class="kpi-value">{unitHp} HP</span>
+                            </div>
+                        </div>
+
+                        <!-- ASESOR DE VENTAS -->
+                        <div class="quick-contact-card">
+                            <h4 class="contact-title">Ejecutivo de Ventas Asignado</h4>
+                            <p class="contact-name">👤 {contactName}</p>
+                            <div class="contact-actions">
+                                <template if:true={contactPhone}>
+                                    <a href={phoneCallUrl} class="btn-action call">
+                                        <lightning-icon icon-name="utility:call" size="x-small" class="btn-action-icon"></lightning-icon>
+                                        Llamar ({contactPhone})
+                                    </a>
+                                </template>
+                                <template if:true={contactEmail}>
+                                    <a href={emailMailtoUrl} class="btn-action email">
+                                        <lightning-icon icon-name="utility:email" size="x-small" class="btn-action-icon"></lightning-icon>
+                                        Solicitar Cotización
+                                    </a>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- CONFIGURACIÓN DE TREN MOTRIZ Y EJES -->
+                <div class="detail-section">
+                    <div class="section-header">
+                        <lightning-icon icon-name="utility:settings" size="x-small" class="section-icon"></lightning-icon>
+                        <h3>Especificaciones de Configuración Pesada</h3>
+                    </div>
+                    <div class="specs-grid">
+                        <div class="spec-tile">
+                            <span class="tile-label">Modelo del Motor</span>
+                            <span class="tile-value">{unitEngineModel}</span>
+                        </div>
+                        <div class="spec-tile">
+                            <span class="tile-label">Transmisión</span>
+                            <span class="tile-value">{unitTransmission}</span>
+                        </div>
+                        <div class="spec-tile">
+                            <span class="tile-label">Camarote</span>
+                            <span class="tile-value">{unitSleeper}</span>
+                        </div>
+                        <div class="spec-tile">
+                            <span class="tile-label">Capacidad Suspensión</span>
+                            <span class="tile-value">{unitSuspension}</span>
+                        </div>
+                        <div class="spec-tile">
+                            <span class="tile-label">Eje Delantero</span>
+                            <span class="tile-value">{unitFrontAxle}</span>
+                        </div>
+                        <div class="spec-tile">
+                            <span class="tile-label">Eje Trasero</span>
+                            <span class="tile-value">{unitRearAxle}</span>
+                        </div>
+                        <div class="spec-tile">
+                            <span class="tile-label">Paso Diferenciales</span>
+                            <span class="tile-value">{unitDifferential}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ESTADO TELEMÉTRICO Y UBICACIÓN GPS -->
+                <div class="detail-section">
+                    <div class="section-header">
+                        <lightning-icon icon-name="utility:checkin" size="x-small" class="section-icon"></lightning-icon>
+                        <h3>Telemetría y Ubicación Geográfica GPS</h3>
+                    </div>
+                    <div class="location-card">
+                        <div class="telemetry-info">
+                            <span class="location-coords">📍 Lat: {latitude} | Lon: {longitude}</span>
+                            <div class="telemetry-badges">
+                                <span class="telemetry-tag">⚡ Velocidad: {currentSpeed}</span>
+                                <span class="telemetry-tag">🕒 Último Ping: {lastGpsUpdate}</span>
+                            </div>
+                        </div>
+                        <template if:true={hasCoordinates}>
+                            <a href={googleMapsUrl} target="_blank" rel="noopener" class="btn-maps">
+                                Abrir en Google Maps ↗
+                            </a>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- OBSERVACIONES GENERALES -->
+                <template if:true={unitNotes}>
+                    <div class="detail-section">
+                        <div class="section-header">
+                            <lightning-icon icon-name="utility:description" size="x-small" class="section-icon"></lightning-icon>
+                            <h3>Observaciones e Historial del Vehículo</h3>
+                        </div>
+                        <div class="notes-box">
+                            <p>{unitNotes}</p>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- GALERÍA SECUNDARIA -->
+                <template if:true={hasRemainingImages}>
+                    <div class="detail-section">
+                        <div class="section-header">
+                            <lightning-icon icon-name="utility:opened_folder" size="x-small" class="section-icon"></lightning-icon>
+                            <h3>Galería Fotográfica Complementaria</h3>
+                        </div>
+                        <div class="gallery-grid">
+                            <template for:each={remainingImages} for:item="imgHtml">
+                                <div key={imgHtml} class="gallery-item">
+                                    <lightning-formatted-rich-text value={imgHtml}></lightning-formatted-rich-text>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+
             </div>
 
-            <footer class="slds-modal__footer">
-                <lightning-button label="Cerrar" onclick={closeModal}></lightning-button>
+            <!-- PIE DE PÁGINA FIJO ABAJO -->
+            <footer class="modal-footer">
+                <button class="btn-secondary" onclick={closeModal}>
+                    Cerrar Ficha Técnica
+                </button>
             </footer>
         </div>
     </section>

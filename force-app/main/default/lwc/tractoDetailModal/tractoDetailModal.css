@@ -1,27 +1,478 @@
-.rich-text-container img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-/* Esto asegura que las imágenes se adapten al contenedor del modal */
-.main-image :host img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+:host {
+    /* Paleta Industrial & Fleet Professional */
+    --color-brand-primary: #0B2545;
+    --color-brand-secondary: #D90429;
+    --color-accent-blue: #134074;
+
+    --color-bg-app: #F8FAFC;
+    --color-bg-card: #FFFFFF;
+    --color-border: #E2E8F0;
+
+    --color-text-main: #0F172A;
+    --color-text-muted: #64748B;
+
+    --color-status-disp-bg: #DCFCE7;
+    --color-status-disp-text: #166534;
+
+    --color-status-mant-bg: #FEF3C7;
+    --color-status-mant-text: #92400E;
+
+    --color-status-vend-bg: #FEE2E2;
+    --color-status-vend-text: #991B1B;
 }
 
-.gallery {
+/* SOBRESCRITURA DEL CONTENEDOR MODAL SLDS (ALTO FIJO) */
+.slds-modal__container,
+.modal-container {
+    background-color: var(--color-bg-card) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25) !important;
+    height: 85vh !important;
+    max-height: 85vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    margin: auto !important;
+}
+
+/* ENCABEZADO FIJO ARRIBA */
+.modal-header {
+    background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-accent-blue) 100%);
+    color: #FFFFFF;
+    padding: 16px 24px;
     display: flex;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0 !important;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.brand-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-icon {
+    background: rgba(255, 255, 255, 0.12);
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.unit-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0;
+    color: #FFFFFF;
+}
+
+.unit-subtitle {
+    font-size: 0.775rem;
+    color: #94A3B8;
+    margin: 2px 0 0 0;
+}
+
+.btn-close-header {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.btn-close-header:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* BADGES DE ESTADO */
+.badge-status {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.badge-status.disponible {
+    background-color: var(--color-status-disp-bg);
+    color: var(--color-status-disp-text);
+}
+
+.badge-status.mantenimiento {
+    background-color: var(--color-status-mant-bg);
+    color: var(--color-status-mant-text);
+}
+
+.badge-status.vendido {
+    background-color: var(--color-status-vend-bg);
+    color: var(--color-status-vend-text);
+}
+
+/* CUERPO CENTRAL CON SCROLL INDEPENDIENTE */
+.modal-body {
+    padding: 20px 24px !important;
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+    background-color: var(--color-bg-app);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* GRID SUPERIOR */
+.top-overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.main-image-card {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+}
+
+.rich-image-wrapper {
+    width: 100%;
+    max-height: 260px;
+    overflow: hidden;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+}
+
+.rich-image-wrapper img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.no-image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+.placeholder-icon {
+    --slds-c-icon-color-foreground: #CBD5E1;
+}
+
+/* RESUMEN COMERCIAL Y ARRENDAMIENTO */
+.executive-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.price-banner {
+    background: linear-gradient(135deg, #0F172A 0%, var(--color-brand-primary) 100%);
+    color: #FFFFFF;
+    padding: 14px 18px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-label {
+    font-size: 0.725rem;
+    color: #94A3B8;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.price-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #38BDF8;
+}
+
+.lease-badge {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #E0F2FE;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.kpi-card {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    padding: 10px 12px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-label {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.kpi-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.quick-contact-card {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-brand-secondary);
+    padding: 12px 14px;
+    border-radius: 8px;
+}
+
+.contact-title {
+    font-size: 0.725rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin: 0 0 4px 0;
+    font-weight: 700;
+}
+
+.contact-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 0 0 10px 0;
+}
+
+.contact-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.775rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-action.call {
+    background-color: var(--color-brand-primary);
+    color: #FFFFFF;
+}
+
+.btn-action.email {
+    background-color: #F1F5F9;
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border);
+}
+
+.btn-action-icon {
+    --slds-c-icon-color-foreground: currentColor;
+}
+
+/* SECCIONES DE DETALLES */
+.detail-section {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.section-header h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.section-icon {
+    --slds-c-icon-color-foreground: var(--color-brand-primary);
+}
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 10px;
 }
 
-.thumbnail :host img {
-    width: 100px;
-    height: 100px;
+.spec-tile {
+    background: #F8FAFC;
+    padding: 8px 10px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tile-label {
+    font-size: 0.675rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.tile-value {
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+/* LOCATION & TELEMETRY */
+.location-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #F8FAFC;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.telemetry-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.location-coords {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    font-family: monospace;
+}
+
+.telemetry-badges {
+    display: flex;
+    gap: 8px;
+}
+
+.telemetry-tag {
+    background: #E2E8F0;
+    color: #334155;
+    font-size: 0.725rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.btn-maps {
+    background: var(--color-accent-blue);
+    color: #FFFFFF;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.775rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.notes-box p {
+    font-size: 0.85rem;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+/* GALERÍA SECUNDARIA */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.gallery-item {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    overflow: hidden;
+    height: 90px;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border: 1px solid #ddd;
+}
+
+/* PIE DE PÁGINA (FOOTER) FIJO PEGADO TOTALMENTE ABAJO Y A LA DERECHA */
+.modal-footer {
+    padding: 16px 24px !important;
+    background-color: #F8FAFC !important;
+    border-top: 1px solid var(--color-border) !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    margin-top: auto !important;
+    width: 100% !important;
+    border-bottom-left-radius: 12px !important;
+    border-bottom-right-radius: 12px !important;
+}
+
+.btn-secondary {
+    background-color: var(--color-brand-primary);
+    border: none;
+    color: #FFFFFF;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    box-shadow: 0 2px 4px rgba(11, 37, 69, 0.2);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-brand-secondary);
+}
+
+/* SCROLLBAR SLIM */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
     border-radius: 4px;
 }

@@ -1,13 +1,290 @@
-.scroll {
-    max-height: 100vh; 
+:host {
+    /* Paleta Industrial & Fleet Professional */
+    --color-brand-primary: #0B2545;
+    --color-brand-secondary: #D90429;
+    --color-accent-blue: #134074;
+
+    --color-bg-card: #FFFFFF;
+    --color-border: #E2E8F0;
+    --color-border-hover: #CBD5E1;
+
+    --color-text-main: #0F172A;
+    --color-text-muted: #64748B;
+
+    --color-status-disp-bg: #DCFCE7;
+    --color-status-disp-text: #166534;
+
+    --color-status-mant-bg: #FEF3C7;
+    --color-status-mant-text: #92400E;
+
+    --color-status-vend-bg: #FEE2E2;
+    --color-status-vend-text: #991B1B;
+
+    display: block;
     height: 100%;
-    overflow-y: auto; 
-    overflow-x: hidden;
-    padding: 0.5rem;
-    scrollbar-width: thin; 
-    scrollbar-color: #0176d3 #f3f2f2; 
     width: 100%;
 }
-/* .mi-icono-personalizado {
-    --slds-c-icon-color-foreground: #FF5733;
-} */
+
+.catalog-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+}
+
+/* Header del Catálogo */
+.catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px 12px 12px;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 8px;
+}
+
+.catalog-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.catalog-badge {
+    background-color: #E2E8F0;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+/* Grid contenedor de Tarjetas */
+.tracts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding-right: 4px;
+    flex: 1;
+}
+
+/* Tarjeta Individual de Tractocamión */
+.tract-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.tract-card:hover {
+    border-color: var(--color-accent-blue);
+    box-shadow: 0 8px 16px rgba(19, 64, 116, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Encabezado de la Tarjeta */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.truck-icon-wrapper {
+    background: #F1F5F9;
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    --slds-c-icon-color-foreground: var(--color-brand-primary);
+}
+
+.title-group {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.unit-name {
+    font-size: 0.925rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.unit-vin {
+    font-size: 0.725rem;
+    color: var(--color-text-muted);
+    font-family: monospace;
+}
+
+/* Badges de Estado */
+.badge-status {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-status.disponible {
+    background-color: var(--color-status-disp-bg);
+    color: var(--color-status-disp-text);
+}
+
+.badge-status.mantenimiento {
+    background-color: var(--color-status-mant-bg);
+    color: var(--color-status-mant-text);
+}
+
+.badge-status.vendido {
+    background-color: var(--color-status-vend-bg);
+    color: var(--color-status-vend-text);
+}
+
+/* Cuerpo de Especificaciones */
+.card-body {
+    background-color: #F8FAFC;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+.spec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.spec-item.full-width {
+    grid-column: span 2;
+    border-top: 1px dashed var(--color-border);
+    padding-top: 6px;
+    margin-top: 2px;
+}
+
+.spec-label {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.spec-value {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.spec-price {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--color-brand-primary);
+}
+
+/* Botón de Acción */
+.card-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-details {
+    width: 100%;
+    background-color: #F1F5F9;
+    color: var(--color-brand-primary);
+    border: 1px solid var(--color-border);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-details:hover {
+    background-color: var(--color-brand-secondary);
+    color: #FFFFFF;
+    border-color: var(--color-brand-secondary);
+}
+
+.btn-details:hover .btn-icon {
+    --slds-c-icon-color-foreground: #FFFFFF;
+}
+
+.btn-icon {
+    --slds-c-icon-color-foreground: var(--color-brand-primary);
+    transition: transform 0.2s ease;
+}
+
+.btn-details:hover .btn-icon {
+    transform: translateX(3px);
+}
+
+/* Estado Vacío */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 24px;
+    text-align: center;
+    color: var(--color-text-muted);
+}
+
+.empty-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 12px 0 4px 0;
+}
+
+.empty-desc {
+    font-size: 0.825rem;
+    margin: 0;
+}
+
+/* Scrollbar Personalizado */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
