@@ -1,12 +1,14 @@
 import { LightningElement, track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import createTracto from '@salesforce/apex/TractoCreateController.createTracto';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
-export default class TractoCreateModal extends LightningElement {
+export default class TractoCreateModal extends NavigationMixin(LightningElement) {
     @track isLoading = false;
 
-    // Objeto reactivo con los valores por defecto del objeto
+    // Objeto reactivo con los valores por defecto
     @track tracto = {
+        Empresa__c: null, // Id de la Account (Empresa Vendedora)
         Name: '',
         Modelo__c: '',
         Year_Modelo__c: new Date().getFullYear(),
@@ -29,6 +31,7 @@ export default class TractoCreateModal extends LightningElement {
         Nombre_Contacto__c: '',
         Numero_del_Contacto__c: '',
         Correo_Contacto__c: '',
+        Imagen__c: '',
         Observaciones_Generales__c: ''
     };
 
@@ -36,12 +39,34 @@ export default class TractoCreateModal extends LightningElement {
         return [
             { label: 'Disponible', value: 'Disponible' },
             { label: 'En Mantenimiento', value: 'En Mantenimiento' },
+            { label: 'En Negociación', value: 'En Negociación' },
             { label: 'Vendido', value: 'Vendido' }
         ];
     }
 
     closeModal() {
         this.dispatchEvent(new CustomEvent('close'));
+    }
+
+    /**
+     * Captura el Id de la Account seleccionada en el Lookup de Empresa__c
+     */
+    handleEmpresaChange(event) {
+        const selectedValue = event.detail.value;
+        this.tracto.Empresa__c = Array.isArray(selectedValue) ? selectedValue[0] : selectedValue;
+    }
+
+    /**
+     * Abre la ventana emergente estándar de Salesforce para crear una nueva Cuenta (Empresa)
+     */
+    handleCreateNewAccount() {
+        this[NavigationMixin.Navigate]({
+            type: 'standard__objectPage',
+            attributes: {
+                objectApiName: 'Account',
+                actionName: 'new'
+            }
+        });
     }
 
     /**
@@ -55,17 +80,22 @@ export default class TractoCreateModal extends LightningElement {
     }
 
     /**
-     * Valida que todos los campos requeridos estén llenos
+     * Valida que todos los campos requeridos estén completos
      */
     validateFields() {
-        const allValid = [
+        if (!this.tracto.Empresa__c) {
+            this.showToast('Atención', 'Debe seleccionar o crear la Empresa Vendedora propietaria de la unidad.', 'warning');
+            return false;
+        }
+
+        const inputs = [
             ...this.template.querySelectorAll('lightning-input, lightning-combobox, lightning-textarea')
-        ].reduce((validSoFar, inputCmp) => {
+        ];
+
+        return inputs.reduce((validSoFar, inputCmp) => {
             inputCmp.reportValidity();
             return validSoFar && inputCmp.checkValidity();
         }, true);
-
-        return allValid;
     }
 
     /**
@@ -73,17 +103,16 @@ export default class TractoCreateModal extends LightningElement {
      */
     async handleSave() {
         if (!this.validateFields()) {
-            this.showToast('Atención', 'Por favor complete todos los campos obligatorios.', 'warning');
             return;
         }
 
         this.isLoading = true;
 
         try {
-            // Llamada al método Apex
             const newRecordId = await createTracto({ tractoObj: this.tracto });
 
-            // Notifica al componente padre (tracksTemplate) para recargar datos
+            this.showToast('¡Éxito!', 'Tractocamión registrado correctamente.', 'success');
+
             this.dispatchEvent(new CustomEvent('createdsuccess', {
                 detail: { id: newRecordId }
             }));

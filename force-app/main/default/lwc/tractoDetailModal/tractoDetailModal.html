@@ -2,7 +2,7 @@
     <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
         <div class="slds-modal__container modal-container">
 
-            <!-- ENCABEZADO FIJO -->
+            <!-- ENCABEZADO FIJO DE FICHA TÉCNICA -->
             <header class="modal-header">
                 <div class="header-content">
                     <div class="brand-title">
@@ -11,18 +11,23 @@
                         </div>
                         <div>
                             <h2 class="unit-title">{unitName}</h2>
-                            <p class="unit-subtitle">VIN: {unitVin} | Año: {unitYear} | {companyName}</p>
+                            <p class="unit-subtitle">VIN: {unitVin} | Año: {unitYear} | Empresa: <strong>{companyName}</strong></p>
                         </div>
                     </div>
                     <span class={statusClass}>{unitStatus}</span>
                 </div>
-                <button class="btn-close-header" onclick={closeModal} title="Cerrar ventana">
+                <!-- <button class="btn-close-header" onclick={closeModal} title="Cerrar ventana">
                     <lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
-                </button>
+                </button> -->
             </header>
 
             <!-- CUERPO CON SCROLL INDEPENDIENTE -->
             <div class="modal-body custom-scrollbar">
+
+                <!-- SPINNER DE CARGA -->
+                <template if:true={isLoading}>
+                    <lightning-spinner alternative-text="Procesando venta..." size="medium" variant="brand"></lightning-spinner>
+                </template>
 
                 <!-- RESUMEN PRINCIPAL + TELEMETRÍA EN VIVO -->
                 <div class="top-overview-grid">
@@ -42,7 +47,7 @@
                         </template>
                     </div>
 
-                    <!-- BANNER FINANCIERO Y TELEMETRÍA -->
+                    <!-- BANNER FINANCIERO Y ACCIÓN DE VENTA -->
                     <div class="executive-summary">
                         <div class="price-banner">
                             <div class="price-main">
@@ -76,10 +81,13 @@
                             </div>
                         </div>
 
-                        <!-- ASESOR DE VENTAS -->
+                        <!-- EMPRESA VENDEDORA Y CONTACTO COMERCIAL -->
                         <div class="quick-contact-card">
-                            <h4 class="contact-title">Ejecutivo de Ventas Asignado</h4>
-                            <p class="contact-name">👤 {contactName}</p>
+                            <div class="vendor-header">
+                                <span class="vendor-label">Empresa Vendedora:</span>
+                                <span class="vendor-name">{companyName}</span>
+                            </div>
+                            <p class="contact-name">👤 Contacto: {contactName}</p>
                             <div class="contact-actions">
                                 <template if:true={contactPhone}>
                                     <a href={phoneCallUrl} class="btn-action call">
@@ -90,7 +98,7 @@
                                 <template if:true={contactEmail}>
                                     <a href={emailMailtoUrl} class="btn-action email">
                                         <lightning-icon icon-name="utility:email" size="x-small" class="btn-action-icon"></lightning-icon>
-                                        Solicitar Cotización
+                                        Correo
                                     </a>
                                 </template>
                             </div>
@@ -195,6 +203,11 @@
                 <button class="btn-secondary" onclick={closeModal}>
                     Cerrar Ficha Técnica
                 </button>
+                <template if:true={isAvailable}>
+                    <button class="btn-sale-primary" onclick={handleStartSaleProcess}>
+                        🤝 Iniciar Proceso de Venta (Crear Oportunidad)
+                    </button>
+                </template>
             </footer>
         </div>
     </section>

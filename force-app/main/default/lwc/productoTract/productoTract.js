@@ -26,8 +26,9 @@ export default class ProductoTract extends LightningElement {
 
     /**
      * Mapea y prepara la información para la interfaz gráfica:
-     * - Formato de Moneda ($2,450,000)
-     * - Badges dinámicos de estado por color
+     * - Extrae los campos soportando objeto plano o anidado en item.tracto
+     * - Formato de Moneda ($2,450,000 MXN)
+     * - Badges dinámicos de estado (Verde = Disponible, Ámbar = En Negociación, Rojo = Vendido/Mantenimiento)
      */
     get formattedTracts() {
         if (!this.hasTracts) return [];
@@ -39,39 +40,44 @@ export default class ProductoTract extends LightningElement {
         });
 
         return this.allTractsChild.map(item => {
-            const tracto = item.tracto || {};
-            const estado = tracto.Estado_de_la_Unidad__c || 'Desconocido';
+            const t = item.tracto || item;
+            const estado = t.Estado_de_la_Unidad__c || 'Disponible';
 
-            // Determinar la clase CSS del badge según el estado
+            // Determinar la clase CSS del badge según el estado operativo
+            const estadoLower = estado.toLowerCase();
             let statusClass = 'badge-status ';
-            if (estado.toLowerCase().includes('disponible')) {
+
+            if (estadoLower.includes('disponible')) {
                 statusClass += 'disponible';
-            } else if (estado.toLowerCase().includes('mantenimiento')) {
+            } else if (estadoLower.includes('negociación') || estadoLower.includes('negociacion') || estadoLower.includes('mantenimiento') || estadoLower.includes('reservado')) {
                 statusClass += 'mantenimiento';
             } else {
                 statusClass += 'vendido';
             }
 
             return {
-                id: tracto.Id,
-                name: tracto.Name || 'Sin Nombre',
-                modelo: tracto.Modelo__c || 'N/A',
-                year: tracto.Year_Modelo__c || 'N/A',
-                vin: tracto.NumeroVIN__c || 'Sin VIN',
+                id: t.Id,
+                name: t.Name || 'Sin Nombre',
+                modelo: t.Modelo__c || 'N/A',
+                year: t.Year_Modelo__c || 'N/A',
+                vin: t.NumeroVIN__c || 'Sin VIN',
                 estado: estado,
                 statusClass: statusClass,
-                formattedPrice: tracto.Precio_Venta__c ? currencyFormatter.format(tracto.Precio_Venta__c) : 'N/A',
+                formattedPrice: t.Precio_Venta__c ? currencyFormatter.format(t.Precio_Venta__c) : 'N/A',
                 rawObject: item
             };
         });
     }
 
     /**
-     * Emite el evento con el objeto original seleccionado para abrir el modal
+     * Emite el evento con el objeto seleccionado para abrir el modal de detalles
      */
     handleOpenDetails(event) {
         const tractoId = event.currentTarget.dataset.id;
-        const selectedItem = this.allTractsChild.find(item => item.tracto.Id === tractoId);
+        const selectedItem = this.allTractsChild.find(item => {
+            const t = item.tracto || item;
+            return t.Id === tractoId;
+        });
 
         if (selectedItem) {
             this.dispatchEvent(new CustomEvent('viewdetails', {

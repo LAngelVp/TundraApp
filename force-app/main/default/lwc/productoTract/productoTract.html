@@ -25,7 +25,7 @@
                                     <span class="unit-vin">VIN: {item.vin}</span>
                                 </div>
                             </div>
-                            <!-- BADGE DINÁMICO DE ESTADO -->
+                            <!-- BADGE DINÁMICO DE ESTADO (DISPONIBLE / EN NEGOCIACIÓN / VENDIDO) -->
                             <span class={item.statusClass}>{item.estado}</span>
                         </div>
 
@@ -66,7 +66,7 @@
             </div>
         </template>
 
-        <!-- ESTADO VACÍO CUANDO NO HAY RESULTADOS (MARKETING & UX) -->
+        <!-- ESTADO VACÍO CUANDO NO HAY RESULTADOS -->
         <template if:false={hasTracts}>
             <div class="empty-state">
                 <lightning-icon icon-name="utility:search" size="large" class="empty-icon"></lightning-icon>

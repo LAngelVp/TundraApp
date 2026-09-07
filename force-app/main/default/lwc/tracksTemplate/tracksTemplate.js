@@ -43,6 +43,24 @@ export default class TracksTemplate extends LightningElement {
     }
 
     /**
+     * Maneja el evento disparado al presionar "Iniciar Proceso de Venta"
+     * Refresca los datos en tiempo real para que el mapa cambie el marcador a Ámbar (En Negociación)
+     */
+    async handleSaleStarted(event) {
+        const oppId = event.detail.opportunityId;
+        this.handleCloseModal();
+
+        this.mensaje(
+            '¡Negociación Iniciada!',
+            'La oportunidad se creó exitosamente y la unidad ha cambiado a estado "En Negociación" (Reserva Ámbar).',
+            'success'
+        );
+
+        // Refresca la consulta SOQL para actualizar lista y mapa Leaflet
+        await refreshApex(this.wiredResult);
+    }
+
+    /**
      * Modal de Creación
      */
     handleOpenCreateModal() {

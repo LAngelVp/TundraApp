@@ -1,7 +1,10 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
+import generarOportunidadVenta from '@salesforce/apex/TractosController.generarOportunidadVenta';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class TractoDetailModal extends LightningElement {
     @api selectedTracto;
+    @track isLoading = false;
 
     closeModal() {
         this.dispatchEvent(new CustomEvent('close'));
@@ -19,11 +22,15 @@ export default class TractoDetailModal extends LightningElement {
     get unitModel() { return this.tractoObj.Modelo__c || 'N/A'; }
     get unitStatus() { return this.tractoObj.Estado_de_la_Unidad__c || 'Disponible'; }
 
+    get isAvailable() {
+        return (this.unitStatus || '').toLowerCase() === 'disponible';
+    }
+
     get statusClass() {
         const estado = (this.unitStatus || '').toLowerCase();
         let baseClass = 'badge-status ';
         if (estado.includes('disponible')) return baseClass + 'disponible';
-        if (estado.includes('mantenimiento')) return baseClass + 'mantenimiento';
+        if (estado.includes('negociación') || estado.includes('negociacion') || estado.includes('reservado')) return baseClass + 'mantenimiento';
         return baseClass + 'vendido';
     }
 
@@ -37,11 +44,9 @@ export default class TractoDetailModal extends LightningElement {
         }).format(precio);
     }
 
-    // Cálculo Estimado de Arrendamiento (Marketing / Sales Booster)
     get estimatedMonthlyLease() {
         const precio = this.tractoObj.Precio_Venta__c;
         if (!precio) return null;
-        // Estimado simple de financiamiento a 36 meses
         const mensualidad = (precio * 1.25) / 36;
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',
@@ -55,20 +60,18 @@ export default class TractoDetailModal extends LightningElement {
         return km ? `${Number(km).toLocaleString('es-MX')} km` : 'N/A';
     }
 
-    // Telemetría y Empresa
+    // Empresa Vendedora (Relationship Lookup)
     get companyName() {
-        return this.tractoObj.Empresa__r?.Name || 'Kenworth DAF del Este';
+        if (this.tractoObj.Empresa__r && this.tractoObj.Empresa__r.Name) {
+            return this.tractoObj.Empresa__r.Name;
+        }
+        return 'Sin Empresa Asignada';
     }
 
     get currentSpeed() {
         const vel = this.tractoObj.Velocidad_KmH__c;
         if (vel === undefined || vel === null) return '0 km/h';
         return `${vel} km/h`;
-    }
-
-    get speedBadgeClass() {
-        const vel = this.tractoObj.Velocidad_KmH__c || 0;
-        return vel > 0 ? 'badge-telemetry active' : 'badge-telemetry stopped';
     }
 
     get lastGpsUpdate() {
@@ -78,7 +81,7 @@ export default class TractoDetailModal extends LightningElement {
         return dateObj.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Especificaciones Mecánicas y Pesadas
+    // Especificaciones
     get unitEngineBrand() { return this.tractoObj.Marca_de_Motor__c || 'N/A'; }
     get unitEngineModel() { return this.tractoObj.Modelo_del_Motor__c || 'N/A'; }
     get unitHp() { return this.tractoObj.Caballos_de_fuerza_HP__c || 'N/A'; }
@@ -100,7 +103,7 @@ export default class TractoDetailModal extends LightningElement {
             : '#';
     }
 
-    // Coordenadas
+    // Coordenadas GPS
     get latitude() {
         const t = this.tractoObj;
         return t.Ubicacion_GPS__Latitude__s !== undefined ? t.Ubicacion_GPS__Latitude__s : t.Coordenada_Latitud__c;
@@ -122,7 +125,7 @@ export default class TractoDetailModal extends LightningElement {
 
     get unitNotes() { return this.tractoObj.Observaciones_Generales__c || null; }
 
-    // Imágenes
+    // Procesamiento de Imágenes Rich Text
     get processedImages() {
         const richText = this.tractoObj.Imagen__c;
         if (!richText) return { first: null, remaining: [] };
@@ -137,4 +140,41 @@ export default class TractoDetailModal extends LightningElement {
     get firstImage() { return this.processedImages.first; }
     get remainingImages() { return this.processedImages.remaining; }
     get hasRemainingImages() { return this.remainingImages.length > 0; }
+
+    /**
+     * Inicia la venta en Salesforce creando la Oportunidad y reservando la unidad a 'En Negociación'
+     */
+    async handleStartSaleProcess() {
+        this.isLoading = true;
+        try {
+            const oppId = await generarOportunidadVenta({
+                tractoId: this.tractoObj.Id,
+                cuentaId: this.tractoObj.Empresa__c,
+                nombreCliente: this.contactName
+            });
+
+            this.showToast('Oportunidad Creada', 'Se ha iniciado la negociación. La unidad ahora está en estado "En Negociación".', 'success');
+
+            // Notificamos al componente padre para recargar datos y actualizar mapa/lista
+            this.dispatchEvent(new CustomEvent('salestarted', {
+                detail: { opportunityId: oppId, tractoId: this.tractoObj.Id }
+            }));
+
+            this.closeModal();
+
+        } catch (error) {
+            const errorMsg = error.body ? error.body.message : JSON.stringify(error);
+            this.showToast('Error Comercial', errorMsg, 'error');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    showToast(title, message, variant) {
+        this.dispatchEvent(new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        }));
+    }
 }

@@ -50,11 +50,12 @@
         </main>
     </div>
 
-    <!-- MODAL DE DETALLE DEL TRACTO -->
+    <!-- MODAL DE DETALLE DEL TRACTO (CON ESCUCHA DE INICIO DE VENTA) -->
     <template if:true={isModalOpen}>
         <c-tracto-detail-modal
             selected-tracto={tractoSeleccionado}
-            onclose={handleCloseModal}>
+            onclose={handleCloseModal}
+            onsalestarted={handleSaleStarted}>
         </c-tracto-detail-modal>
     </template>
 
